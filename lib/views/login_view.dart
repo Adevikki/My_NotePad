@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:mynotes/constants/routes.dart';
+import 'package:mynotes/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -119,7 +117,7 @@ class _HomePageState extends State<LoginView> {
               const SizedBox(
                 height: 5,
               ),
-              Container(
+              SizedBox(
                 width: screenWidth * 1,
                 height: screenHeight * 0.05,
                 child: TextButton(
@@ -136,15 +134,33 @@ class _HomePageState extends State<LoginView> {
                           '/note_view/', (route) => false);
                       // devtools.log(userCredential.toString());
                     } on FirebaseAuthException catch (e) {
-                      if (e.code == 'User not found') {
-                        devtools.log('user not found');
+                      if (e.code == 'user-not-found') {
+                        await showErrorDialog(
+                          context,
+                          'User not found!',
+                        );
+                        // print('user not found');
                       } else if (e.code == 'wrong-password') {
-                        devtools.log('Wrong password, try again!');
-                        devtools.log(e.code);
+                        await showErrorDialog(
+                          context,
+                          'Wrong Password',
+                        );
+                        // print(e.code);
+                      } else {
+                        await showErrorDialog(
+                          context,
+                          'Error: ${e.code}',
+                        );
                       }
-                    } on SocketException catch (_) {
-                      print('Check your connection guy no stress me!');
+                    } catch (e) {
+                      await showErrorDialog(
+                        context,
+                        e.toString(),
+                      );
                     }
+                    // on SocketException catch (_) {
+                    //   print('Check your connection guy no stress me!');
+                    // }
                   },
                   child: const Text(
                     'Login',
